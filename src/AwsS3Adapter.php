@@ -538,6 +538,9 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     protected function getRawVisibility($path)
     {
+        if (!empty($this->options['override_raw_visibility'])) {
+          return $this->options['override_raw_visibility'];
+        }
         $command = $this->s3Client->getCommand(
             'getObjectAcl',
             [
