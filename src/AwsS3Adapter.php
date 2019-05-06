@@ -483,19 +483,21 @@ class AwsS3Adapter extends AbstractAdapter implements CanOverwriteFiles
      */
     public function setVisibility($path, $visibility)
     {
-        $command = $this->s3Client->getCommand(
+        if (empty($this->options['override_raw_visibility'])) {
+          $command = $this->s3Client->getCommand(
             'putObjectAcl',
             [
-                'Bucket' => $this->bucket,
-                'Key'    => $this->applyPathPrefix($path),
-                'ACL'    => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
+              'Bucket' => $this->bucket,
+              'Key' => $this->applyPathPrefix($path),
+              'ACL' => $visibility === AdapterInterface::VISIBILITY_PUBLIC ? 'public-read' : 'private',
             ]
-        );
+          );
 
-        try {
+          try {
             $this->s3Client->execute($command);
-        } catch (S3Exception $exception) {
-            return false;
+          } catch (S3Exception $exception) {
+            return FALSE;
+          }
         }
 
         return compact('path', 'visibility');
